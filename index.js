@@ -6,7 +6,9 @@ const server = new ws.Server({ port: 8080 })
 server.on('connection', (socket) => {
     clients.add(socket)
 
-    socket.on('close', () => clients.delete(socket))
+    socket.on('close', () => {
+        clients.delete(socket)
+    })
 
     socket.on('message', (msg) => {
         const [comando, ...data] = JSON.parse(msg.toString('utf-8'));
