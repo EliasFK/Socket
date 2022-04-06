@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <form name="conectar">
+        <input type="text" name="nome">
+        <input type="submit" value="conectar">
+    </form>
+    <form name="compositor">
+        <input type="text" name="mensagem">
+        <input type="submit" value="Enviar">
+    </form>
+    <script>
+        const socket = new WebSocket('ws://localhost:8080')
+
+        socket.addEventListener('open', () => console.log('conectado'))
+        socket.addEventListener('close', () => console.log('desconectado'))
+        socket.addEventListener('message', (event) => {
+            const [comando, ...data] = JSON.parse(event.data);
+
+            if (comando === 'mensagem') {
+                const [usuario, mensagem] = data;
+                console.log(`${usuario} disse: ${mensagem}`)
+            }
+        })
+        socket.addEventListener('error', (event) => console.log('error', event.toString()))
+
+        document.forms.conectar.addEventListener('submit', (event) => {
+            event.preventDefault()
+            socket.send(JSON.stringify(['nome', event.target.nome.value]))
+        })
+
+        document.forms.compositor.addEventListener('submit', (event) => {
+            event.preventDefault()
+            socket.send(JSON.stringify(['mensagem', event.target.mensagem.value]));
+            event.target.reset()
+        })
+
+    </script>
+</body>
+
+</html>
